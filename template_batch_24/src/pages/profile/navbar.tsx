@@ -89,7 +89,7 @@ export const Nav = ({ dataProfile } : any) => {
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-                      <div className="relative rounded-ful p-1 text-slate-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                      <div className="relative p-1 text-slate-800 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                         <span className="absolute  -inset-1.5" />
                         <span className="sr-only">View notifications</span>
                         {`Welcome, ${item.userFirstName} ${item.userLastName}!`}
@@ -152,7 +152,7 @@ export const Nav = ({ dataProfile } : any) => {
                 </div>
               </div>
 
-              {/* <Disclosure.Panel className="md:hidden">
+              <Disclosure.Panel className="md:hidden">
                 <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                   {navigation.map((item) => (
                     <Disclosure.Button
@@ -200,7 +200,7 @@ export const Nav = ({ dataProfile } : any) => {
                     ))}
                   </div>
                 </div>
-              </Disclosure.Panel> */}
+              </Disclosure.Panel>
             </>
           )}
         </Disclosure>

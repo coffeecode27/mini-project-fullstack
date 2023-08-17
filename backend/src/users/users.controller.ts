@@ -90,6 +90,7 @@ export class UsersController {
     const userPhoneNumbers = user.usersPhones.map((phone) => phone.uspoNumber);
     return {
       userEntityId: user.userEntityId,
+      userName: user.userName,
       userFirstName: user.userFirstName,
       userLastName: user.userLastName,
       userEmail: userEmails,

@@ -3,7 +3,7 @@ import { Card } from 'flowbite-react';
 import { Button, Timeline } from 'flowbite-react';
 export const CardExperiences = () => {
   return (
-    <Card className='w-full mr-2'>
+    <Card>
       <div className="mb-4 flex">
         <h1 className="text-xl font-bold leading-none text-gray-900 dark:text-white">
           Experinces

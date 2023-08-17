@@ -1,6 +1,8 @@
 import {Nav} from "./navbar"
 import { CardProfile } from "./cardProfile"
+import CardSkill from "./cardSkill"
 import {FooterComponent} from './footer'
+import { CardProfileRightSide } from "./cardProfileRightSide"
 import { useState, useEffect } from "react"
 import { useRouter } from 'next/router';
 import jwt_decode from 'jwt-decode';
@@ -25,7 +27,10 @@ useEffect(()=>{
   return (
     <>
         <Nav dataProfile={dataProfile}/>
+        <div className="flex mt-4">
         <CardProfile dataProfile={dataProfile}/>
+        <CardProfileRightSide/>
+        </div>
         <FooterComponent/>
     </>
   )
