@@ -4,7 +4,7 @@ import { Card } from 'flowbite-react';
 import { Flowbite } from 'flowbite-react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
 import { Button, Checkbox, Label, Modal, TextInput } from 'flowbite-react';
-import CardInformation from './settings/cardInformation';
+import CardEditPassword from './edit/cardEditPassword';
 const customTheme: CustomFlowbiteTheme = {
   button: {
     color: {
@@ -36,7 +36,7 @@ const CardLogin = () => {
         <Modal show={props.openModal === 'form-elements'} size="lg" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardEditPassword/>
           </Modal.Body>
         </Modal>
       </Flowbite>

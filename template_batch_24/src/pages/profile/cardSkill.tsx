@@ -4,7 +4,8 @@ import { Card } from 'flowbite-react';
 import { Flowbite } from 'flowbite-react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
 import { Button, Checkbox, Label, Modal, TextInput } from 'flowbite-react';
-import CardInformation from './settings/cardInformation';
+import CardInformation from './edit/cardEditProfile';
+import CardAddSkill from './add/cardAddSkill';
 const customTheme: CustomFlowbiteTheme = {
   button: {
     color: {
@@ -26,15 +27,15 @@ const CardSkill = () => {
         </h5>
         <span className="flex items-center">
       <Flowbite theme={{ theme: customTheme }}>
-          <Button color="add" className="w-5 h-5" onClick={() => props.setOpenModal('form-elements')}>
+          <Button color="add" className="w-5 h-5" onClick={() => props.setOpenModal('form-add-skill')}>
           <svg className="w-4 h-4 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 5.757v8.486M5.757 10h8.486M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
         </svg>
         </Button>
-        <Modal show={props.openModal === 'form-elements'} size="lg" popup onClose={() => props.setOpenModal(undefined)}>
+        <Modal show={props.openModal === 'form-add-skill'} size="lg" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardAddSkill/>
           </Modal.Body>
         </Modal>
       </Flowbite>

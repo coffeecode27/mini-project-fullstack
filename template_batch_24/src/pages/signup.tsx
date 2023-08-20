@@ -172,6 +172,7 @@ export default function signup() {
                 </span>
               ) : null}
             </div>
+            
             <div className="w-full md:w-full px-3 mb-6">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -199,6 +200,7 @@ export default function signup() {
                 </span>
               ) : null}
             </div>
+
             <div className="w-full md:w-full px-3 mb-6">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"

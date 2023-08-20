@@ -4,7 +4,8 @@ import { Card } from 'flowbite-react';
 import { Flowbite } from 'flowbite-react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
 import { Button, Checkbox, Label, Modal, TextInput } from 'flowbite-react';
-import CardInformation from './settings/cardInformation';
+import CardInformation from './edit/cardEditProfile';
+import CardAddAddress from './add/cardAddAddress';
 const customTheme: CustomFlowbiteTheme = {
   button: {
     color: {
@@ -31,10 +32,10 @@ const CardAddress = () => {
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 5.757v8.486M5.757 10h8.486M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
         </svg>
         </Button>
-        <Modal show={props.openModal === 'form-elements'} size="lg" popup onClose={() => props.setOpenModal(undefined)}>
+        <Modal show={props.openModal === 'form-elements'} size="3xl" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardAddAddress/>
           </Modal.Body>
         </Modal>
       </Flowbite>

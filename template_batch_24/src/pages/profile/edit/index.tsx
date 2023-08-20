@@ -1,6 +1,6 @@
 import React from 'react'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
-import CardInformation from './cardInformation'
+import CardInformation from './cardEditProfile'
 const ProfileSettings = () => {
   return (
 <>

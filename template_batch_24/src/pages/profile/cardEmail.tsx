@@ -5,7 +5,8 @@ import { Button, Checkbox, Label, Modal, TextInput } from 'flowbite-react';
 import { Flowbite } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
-import CardInformation from './settings/cardInformation';
+import CardAddEmail from './add/cardAddEmail';
+
 
 const customTheme: CustomFlowbiteTheme = {
   button: {
@@ -38,7 +39,7 @@ const CardEmail = () => {
         <Modal size="lg" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardAddEmail/>
           </Modal.Body>
         </Modal>
       </Flowbite>
@@ -64,7 +65,7 @@ const CardEmail = () => {
         <Modal size="lg" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardAddEmail/>
           </Modal.Body>
         </Modal>
       </Flowbite>
@@ -77,7 +78,7 @@ const CardEmail = () => {
         <Modal size="lg" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardAddEmail/>
           </Modal.Body>
         </Modal>
       </Flowbite>
@@ -101,7 +102,7 @@ const CardEmail = () => {
          <Modal size="lg" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardAddEmail/>
           </Modal.Body>
         </Modal>
       </Flowbite>
@@ -114,7 +115,7 @@ const CardEmail = () => {
         <Modal show={props.openModal === 'form-elements'} size="lg" popup onClose={() => props.setOpenModal(undefined)}>
           <Modal.Header />
           <Modal.Body>
-            <CardInformation/>
+            <CardAddEmail/>
           </Modal.Body>
         </Modal>
       </Flowbite>
