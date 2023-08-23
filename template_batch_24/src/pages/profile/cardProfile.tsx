@@ -26,6 +26,7 @@ const customTheme: CustomFlowbiteTheme = {
 export const CardProfile = ({ dataProfile } : any) => {
   const [openModal, setOpenModal] = useState<string | undefined>();
   const [email, setEmail] = useState("");
+ 
   const props = { openModal, setOpenModal, email, setEmail };
   const dispatch = useDispatch()
   const id = dataProfile.userid
@@ -35,10 +36,11 @@ export const CardProfile = ({ dataProfile } : any) => {
       dispatch(getDataOneUserReq(id))
     }
   },[id])
-
+    
     return(
     <div className='flex w-1/3 flex-col mr-4'>
     <Card className='ml-3'>
+    
     {dataUser && dataUser.map((item: any) => (
    <div key={item.userId} className="flex flex-col pb-10">
      <span className="flex justify-end">
@@ -51,30 +53,38 @@ export const CardProfile = ({ dataProfile } : any) => {
     <Modal show={props.openModal === 'form-elements'} size="lg" popup onClose={() => props.setOpenModal(undefined)}>
         <Modal.Header />
         <Modal.Body>
-        <CardEditProfile/>
+        <CardEditProfile dataProfile={dataProfile} dataItem={item}/>
         </Modal.Body>
       </Modal>
     </Flowbite>
     </span>
-      <img
-     alt="Bonnie image"
-     className="mb-3 rounded-full shadow-lg"
-     height="96"
-     src="https://cdn.vectorstock.com/i/preview-1x/66/14/default-avatar-photo-placeholder-profile-picture-vector-21806614.jpg"
-     width="96"
-     />
+
+  {item.userPhoto ? (
+  <img src={`http://localhost:5000/api/photo/${item.userPhoto}`} alt="User Profile" className="mb-3 rounded-full shadow-lg" style={{ width: '150px', height: '150px' }}/>
+) : (
+  <img
+    alt="Bonnie image"
+    className="mb-3 rounded-full shadow-lg"
+    height="96"
+    src="https://cdn.vectorstock.com/i/preview-1x/66/14/default-avatar-photo-placeholder-profile-picture-vector-21806614.jpg"
+    width="96"
+  />
+)}
+
     <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
        {`${item.userFirstName} ${item.userLastName}`}
      </h5>
      <span className="text-sm text-gray-500 dark:text-gray-400">
        {item.userName}
+     {console.log("DATA PHONE",item.userPhoneNumber[0].uspoNumber)}
      </span>
    </div>
-    ))}
-    </Card>
+
+))}
+</Card>
     <CardLogin/>
     <CardEmail/>
-    <CardPhone/>
+    <CardPhone dataUser={dataUser}/>
     <CardAddress/>
     </div>
     )

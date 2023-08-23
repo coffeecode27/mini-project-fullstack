@@ -16,6 +16,8 @@ import { JwtService } from '@nestjs/jwt';
 import { City } from 'output/entities/City';
 import { UsersExperiences } from 'output/entities/UsersExperiences';
 import { PhoneNumberType } from 'output/entities/PhoneNumberType';
+import { UsersSkill } from 'output/entities/UsersSkill';
+import { SkillType } from 'output/entities/SkillType';
 
 const salt = 10;
 
@@ -50,6 +52,10 @@ export class UsersService {
     private UsersEducationRepository: Repository<UsersEducation>,
     @InjectRepository(UsersExperiences)
     private UsersExperiencesRepository: Repository<UsersExperiences>,
+    @InjectRepository(UsersSkill)
+    private UsersSkillRepository: Repository<UsersSkill>, // penambahan repo user skill
+    @InjectRepository(SkillType)
+    private SkillTypeRepository: Repository<SkillType>, // penambahan repo skill type
     private jwtService: JwtService,
   ) {}
 
@@ -107,6 +113,7 @@ export class UsersService {
       .where('user.userEntityId = :id', { id })
       .leftJoinAndSelect('user.usersEmails', 'usersEmail')
       .leftJoinAndSelect('user.usersPhones', 'usersPhone')
+      .leftJoinAndSelect('usersPhone.uspoPontyCode', 'phoneNumberType') // Tambahkan relasi
       .getOne();
   }
 
@@ -400,15 +407,21 @@ export class UsersService {
   //fungsi editprofile users
   public async editprofile(file, id: number, fields: any) {
     try {
-      const user = await this.userRepo.update(id, {
-        userName: fields.name,
-        userFirstName: fields.firstname,
-        userLastName: fields.lastname,
-        userPhoto: file.filename,
-        userBirthDate: fields.birthdate,
-        userModifiedDate: new Date(),
-      });
-      return { user };
+      if (file && file.filename) {
+        // Pengecekan apakah file dan filename ada
+        const user = await this.userRepo.update(id, {
+          userName: fields.username,
+          userFirstName: fields.firstName,
+          userLastName: fields.lastName,
+          userPhoto: file.filename,
+          userBirthDate: fields.birthdate,
+          userModifiedDate: new Date(),
+        });
+        return { user };
+      } else {
+        // Handle jika file atau filename tidak ada
+        throw new Error('Invalid file or filename');
+      }
     } catch (error) {
       throw new Error(error.message);
     }
@@ -549,25 +562,16 @@ export class UsersService {
   }
 
   //fungsi add address
-  public async addaddress(id: number, fields: any) {
+  public async addaddress(id: number, fields: any, search_city: string) {
     try {
-      let cityname;
-      switch (fields.city) {
-        case 'Bandung':
-        case 'Bogor':
-        case 'Jakarta':
-          cityname = fields.city;
-          break;
-        default:
-          throw new Error('Invalid city.');
-      }
-
-      const city = await this.CityRepository.findOne({
-        where: { cityName: cityname },
-      });
+      const city = await this.CityRepository.createQueryBuilder('city')
+        .where('city_name ILIKE :search_city', {
+          search_city: `%${search_city}%`,
+        })
+        .getOne();
 
       if (!city) {
-        throw new Error(`City with name ${cityname} not found.`);
+        throw new Error(`City with name ${search_city} not found.`);
       }
 
       const cityId = city.cityId;
@@ -629,39 +633,28 @@ export class UsersService {
     }
   }
 
-  // fungsi edit address
-  public async editaddress(id: number, fields: any) {
+  // Edit Address
+  public async editaddress(addrid: number, fields: any, search_city: string) {
     try {
       const address = await this.AddressRepository.findOne({
         where: {
-          addrId: id,
+          addrId: addrid,
         },
       });
       if (!address) {
         throw new Error('Address not found');
       }
 
-      let cityname;
-      switch (fields.city) {
-        case 'Bandung':
-        case 'Bogor':
-        case 'Jakarta':
-          cityname = fields.city;
-          break;
-        default:
-          throw new Error('Invalid city.');
-      }
-
-      const city = await this.CityRepository.findOne({
-        where: { cityName: cityname },
-      });
+      const city = await this.CityRepository.createQueryBuilder('city')
+        .where('city_name ILIKE :search_city', {
+          search_city: `%${search_city}%`,
+        })
+        .getOne();
 
       if (!city) {
-        throw new Error(`City with name ${cityname} not found.`);
+        throw new Error(`City with name ${search_city} not found.`);
       }
-
       const cityId = city.cityId;
-
       let adtyName;
       switch (fields.type) {
         case 'Home':
@@ -687,7 +680,7 @@ export class UsersService {
       const adtyId = adty.adtyId;
 
       const useraddress = await this.AddressRepository.update(
-        { addrId: id },
+        { addrId: addrid },
         {
           addrLine1: fields.address1,
           addrLine2: fields.address2,
@@ -698,7 +691,7 @@ export class UsersService {
       );
 
       const useraddressadty = await this.UsersAddressRepository.update(
-        { etadAddrId: id },
+        { etadAddrId: addrid },
         {
           etadAdtyId: adtyId,
           etadModifiedDate: new Date(),
@@ -747,6 +740,24 @@ export class UsersService {
         startMonth = 2;
       } else if (fields.start === 'Maret') {
         startMonth = 3;
+      } else if (fields.start === 'April') {
+        startMonth = 4;
+      } else if (fields.start === 'Mei') {
+        startMonth = 5;
+      } else if (fields.start === 'Juni') {
+        startMonth = 6;
+      } else if (fields.start === 'Juli') {
+        startMonth = 7;
+      } else if (fields.start === 'Agustus') {
+        startMonth = 8;
+      } else if (fields.start === 'September') {
+        startMonth = 9;
+      } else if (fields.start === 'Oktober') {
+        startMonth = 10;
+      } else if (fields.start === 'November') {
+        startMonth = 11;
+      } else if (fields.start === 'Desember') {
+        startMonth = 12;
       } else {
         throw new Error('Invalid month not found.');
       }
@@ -767,19 +778,34 @@ export class UsersService {
         endMonth = 2;
       } else if (fields.end === 'Maret') {
         endMonth = 3;
+      } else if (fields.end === 'April') {
+        endMonth = 4;
+      } else if (fields.end === 'Mei') {
+        endMonth = 5;
+      } else if (fields.end === 'Juni') {
+        endMonth = 6;
+      } else if (fields.end === 'Juli') {
+        endMonth = 7;
+      } else if (fields.end === 'Agustus') {
+        endMonth = 8;
+      } else if (fields.end === 'September') {
+        endMonth = 9;
+      } else if (fields.end === 'Oktober') {
+        endMonth = 10;
+      } else if (fields.end === 'November') {
+        endMonth = 11;
+      } else if (fields.end === 'Desember') {
+        endMonth = 12;
       } else {
         throw new Error('Invalid month not found.');
       }
 
       const endYear = fields.endYear;
-
       if (isNaN(endMonth) || isNaN(endYear)) {
         throw new Error('Invalid month or year.');
       }
-
       const endDate = new Date(endYear, endMonth);
       const usduEndDate = endDate.toISOString().slice(0, 7);
-
       const usereducation = await this.UsersEducationRepository.save({
         usduEntityId: id,
         usduSchool: fields.school,
@@ -885,7 +911,7 @@ export class UsersService {
   }
 
   //fungsi add experience
-  public async addexperience(id: number, fields: any) {
+  public async addexperience(id: number, fields: any, search_city: string) {
     try {
       const user = await this.userRepo.findOne({
         where: {
@@ -896,23 +922,14 @@ export class UsersService {
       if (!user) {
         throw new Error(`User with ID ${id} not found.`);
       }
-      let cityname;
-      switch (fields.city) {
-        case 'Bandung':
-        case 'Bogor':
-        case 'Jakarta':
-          cityname = fields.city;
-          break;
-        default:
-          throw new Error('Invalid city.');
-      }
-
-      const city = await this.CityRepository.findOne({
-        where: { cityName: cityname },
-      });
+      const city = await this.CityRepository.createQueryBuilder('city')
+        .where('city_name ILIKE :search_city', {
+          search_city: `%${search_city}%`,
+        })
+        .getOne();
 
       if (!city) {
-        throw new Error(`City with name ${cityname} not found.`);
+        throw new Error(`City with name ${search_city} not found.`);
       }
 
       const cityId = city.cityId;
@@ -924,6 +941,24 @@ export class UsersService {
         startMonth = 2;
       } else if (fields.start === 'Maret') {
         startMonth = 3;
+      } else if (fields.start === 'April') {
+        startMonth = 4;
+      } else if (fields.start === 'Mei') {
+        startMonth = 5;
+      } else if (fields.start === 'Juni') {
+        startMonth = 6;
+      } else if (fields.start === 'Juli') {
+        startMonth = 7;
+      } else if (fields.start === 'Agustus') {
+        startMonth = 8;
+      } else if (fields.start === 'September') {
+        startMonth = 9;
+      } else if (fields.start === 'Oktober') {
+        startMonth = 10;
+      } else if (fields.start === 'November') {
+        startMonth = 11;
+      } else if (fields.start === 'Desember') {
+        startMonth = 12;
       } else {
         throw new Error('Invalid month not found.');
       }
@@ -944,10 +979,27 @@ export class UsersService {
         endMonth = 2;
       } else if (fields.end === 'Maret') {
         endMonth = 3;
+      } else if (fields.end === 'April') {
+        endMonth = 4;
+      } else if (fields.end === 'Mei') {
+        endMonth = 5;
+      } else if (fields.end === 'Juni') {
+        endMonth = 6;
+      } else if (fields.end === 'Juli') {
+        endMonth = 7;
+      } else if (fields.end === 'Agustus') {
+        endMonth = 8;
+      } else if (fields.end === 'September') {
+        endMonth = 9;
+      } else if (fields.end === 'Oktober') {
+        endMonth = 10;
+      } else if (fields.end === 'November') {
+        endMonth = 11;
+      } else if (fields.end === 'Desember') {
+        endMonth = 12;
       } else {
         throw new Error('Invalid month not found.');
       }
-
       const endYear = fields.endyear;
 
       if (isNaN(endMonth) || isNaN(endYear)) {
@@ -961,7 +1013,7 @@ export class UsersService {
       if (fields.current === 'yes') {
         usexcurrent = 1;
       } else if (fields.current === 'no') {
-        startMonth = 0;
+        usexcurrent = 0;
       } else {
         throw new Error('Invalid user experience.');
       }
@@ -1005,6 +1057,7 @@ export class UsersService {
         usexExperienceType: experiencetype,
         usexIsCurrent: usexcurrent,
       });
+
       return { user, userexperiences };
     } catch (error) {
       throw new Error(error.message);
@@ -1012,7 +1065,11 @@ export class UsersService {
   }
 
   //edit data experience
-  public async editexperience(usexid: number, fields: any) {
+  public async editexperience(
+    usexid: number,
+    fields: any,
+    search_city: string,
+  ) {
     try {
       const user = await this.UsersExperiencesRepository.findOne({
         where: {
@@ -1023,23 +1080,14 @@ export class UsersService {
       if (!user) {
         throw new Error(`User with ID ${usexid} not found.`);
       }
-      let cityname;
-      switch (fields.city) {
-        case 'Bandung':
-        case 'Bogor':
-        case 'Jakarta':
-          cityname = fields.city;
-          break;
-        default:
-          throw new Error('Invalid city.');
-      }
-
-      const city = await this.CityRepository.findOne({
-        where: { cityName: cityname },
-      });
+      const city = await this.CityRepository.createQueryBuilder('city')
+        .where('city_name ILIKE :search_city', {
+          search_city: `%${search_city}%`,
+        })
+        .getOne();
 
       if (!city) {
-        throw new Error(`City with name ${cityname} not found.`);
+        throw new Error(`City with name ${search_city} not found.`);
       }
 
       const cityId = city.cityId;
@@ -1051,6 +1099,24 @@ export class UsersService {
         startMonth = 2;
       } else if (fields.start === 'Maret') {
         startMonth = 3;
+      } else if (fields.start === 'April') {
+        startMonth = 4;
+      } else if (fields.start === 'Mei') {
+        startMonth = 5;
+      } else if (fields.start === 'Juni') {
+        startMonth = 6;
+      } else if (fields.start === 'Juli') {
+        startMonth = 7;
+      } else if (fields.start === 'Agustus') {
+        startMonth = 8;
+      } else if (fields.start === 'September') {
+        startMonth = 9;
+      } else if (fields.start === 'Oktober') {
+        startMonth = 10;
+      } else if (fields.start === 'November') {
+        startMonth = 11;
+      } else if (fields.start === 'Desember') {
+        startMonth = 12;
       } else {
         throw new Error('Invalid month not found.');
       }
@@ -1071,6 +1137,24 @@ export class UsersService {
         endMonth = 2;
       } else if (fields.end === 'Maret') {
         endMonth = 3;
+      } else if (fields.end === 'April') {
+        endMonth = 4;
+      } else if (fields.end === 'Mei') {
+        endMonth = 5;
+      } else if (fields.end === 'Juni') {
+        endMonth = 6;
+      } else if (fields.end === 'Juli') {
+        endMonth = 7;
+      } else if (fields.end === 'Agustus') {
+        endMonth = 8;
+      } else if (fields.end === 'September') {
+        endMonth = 9;
+      } else if (fields.end === 'Oktober') {
+        endMonth = 10;
+      } else if (fields.end === 'November') {
+        endMonth = 11;
+      } else if (fields.end === 'Desember') {
+        endMonth = 12;
       } else {
         throw new Error('Invalid month not found.');
       }
@@ -1144,6 +1228,57 @@ export class UsersService {
   public async deleteexperience(usexid: number) {
     await this.UsersExperiencesRepository.delete({
       usexId: usexid,
+    });
+  }
+
+  // penambahan userskill
+  //fungsi add skill
+  public async addskill(id: number, search_skill: string) {
+    try {
+      if (search_skill) {
+        const already_skill = await this.UsersSkillRepository.findOne({
+          where: {
+            uskiEntityId: id,
+            uskiSktyName: search_skill,
+          },
+        });
+
+        if (already_skill) {
+          throw new Error(
+            `Skill with name ${search_skill} already exists for this user.`,
+          );
+        }
+
+        const skillType = await this.SkillTypeRepository.createQueryBuilder(
+          'skill_type',
+        )
+          .where('skty_name ILIKE :search_skill', {
+            search_skill: `%${search_skill}%`,
+          })
+          .getOne();
+
+        if (!skillType) {
+          throw new Error(`Skill with name ${search_skill} not found.`);
+        }
+
+        const userskill = await this.UsersSkillRepository.save({
+          uskiEntityId: id,
+          uskiSktyName: skillType.sktyName,
+          uskiModifiedDate: new Date(),
+        });
+
+        return { userskill };
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  //penambahan delete data users skill
+  //delete data users Skill
+  public async deleteskill(uskiId: number) {
+    await this.UsersSkillRepository.delete({
+      uskiId: uskiId,
     });
   }
 }

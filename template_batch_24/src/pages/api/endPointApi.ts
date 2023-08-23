@@ -57,11 +57,30 @@ const getOneUser = async (id:any) => {
     }
   };
 
+  const editProfile = async (payload: any) => {
+   const formData = new FormData();
+  formData.append('id', payload.id);
+  formData.append('username', payload.username);
+  formData.append('firstName', payload.firstName);
+  formData.append('lastName', payload.lastName);
+  formData.append('birthdate', payload.birthdate);
+  formData.append('file', payload.file); // Menambahkan file ke FormData
+
+  console.log(formData)
+    try {
+      const result = await axios.put(`${config.domain}/api/users/profile/edit/${payload.id}`, formData);
+      return result;
+    } catch (error:any) {
+      return error.response;
+    }
+  };
+
   export default {
     userSignUp,
     getAllUser,
     employeeSignUp,
     getAllEmployee,
     userLogin,
-    getOneUser
+    getOneUser,
+    editProfile
   }

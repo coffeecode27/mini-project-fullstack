@@ -15,7 +15,6 @@ export class UploadMulter {
       }),
 
       fileFilter(req, file, callback) {
-        file.filename = file.filename + file.mimetype;
         if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
           callback(null, true);
         } else {

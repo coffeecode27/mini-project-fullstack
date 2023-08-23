@@ -3,6 +3,7 @@ import * as userAction from '../constant/userConstant';
 import {getAllUser, getOneUser, signUpUser } from './userSaga'
 import { signUpEmployee, getAllEmployee } from './employeeSaga'
 import { loginSaga } from './loginSaga'
+import { editProfile } from './editProfileSaga';
 
 function* watchAll(){
     yield all([
@@ -12,6 +13,7 @@ function* watchAll(){
         takeEvery(userAction.EMPLOYEE_SIGNUP_REQ,signUpEmployee),
         takeEvery(userAction.GET_ALL_EMPLOYEE_REQ,getAllEmployee),
         takeEvery(userAction.USER_LOGIN_REQ, loginSaga),
+        takeEvery(userAction.USER_EDIT_PROFILE_REQ, editProfile),
     ])
 }
 

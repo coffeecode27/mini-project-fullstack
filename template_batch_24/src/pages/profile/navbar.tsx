@@ -8,7 +8,7 @@ import { getDataOneUserReq } from '@/redux-saga/action/userAction';
 // import { userLogout } from '@/redux-saga/action/logoutAction';
 
 
-const user = {
+const user = { 
   name: 'Sendra',
   email: 'tom@example.com',
   imageUrl:
@@ -100,7 +100,12 @@ export const Nav = ({ dataProfile } : any) => {
                           <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                             <span className="absolute -inset-1.5" />
                             <span className="sr-only">Open user menu</span>
-                            <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                            {item.userPhoto ? (
+                              <img src={`http://localhost:5000/api/photo/${item.userPhoto}`} alt="User Profile" className="h-8 w-8 rounded-full"/>
+                            ) : (
+                              <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                           
+                            )}
                           </Menu.Button>
                         </div>
                         <Transition
@@ -118,7 +123,7 @@ export const Nav = ({ dataProfile } : any) => {
                               {({ active }) => (
                                 <a
                                   href={item.href}
-                                  onClick={item.name === 'Sign out' ? handleLogout : undefined} // Call the logout function only for "Sign out"
+                                  onClick={() => item.name === 'Sign out' && handleLogout()} // Call the logout function only for "Sign out"
                                   className={classNames(
                                     active ? 'bg-gray-100' : '',
                                     'block px-4 py-2 text-sm text-gray-700'

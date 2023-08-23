@@ -11,7 +11,12 @@ import {
   UseInterceptors,
   UploadedFile,
   NotFoundException,
+  DefaultValuePipe,
+  Header,
+  StreamableFile,
 } from '@nestjs/common';
+import * as path from 'path';
+import * as fs from 'fs';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -76,10 +81,17 @@ export class UsersController {
     return req.user;
   }
 
-  // @Get(':id')
-  // public async getOne(@Param('id') id: number) {
-  //   return this.authService.findOne(id);
-  // }
+  // handle request gambar
+  @Get('photo/:name')
+  @Header('Content-Type', `image/${'png' || 'jpg' || 'jpeg'}`)
+  @Header('Content-Disposition', 'attachment')
+  getStaticFile(@Param('name') name: string): StreamableFile {
+    const file = fs.createReadStream(
+      path.join(`${process.cwd()}/uploads/`, name),
+    );
+    return new StreamableFile(file);
+  }
+
   @Get(':id')
   public async getOne(@Param('id') id: number) {
     const user = await this.authService.findOne(id);
@@ -87,11 +99,15 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
     const userEmails = user.usersEmails.map((email) => email.pmailAddress);
-    const userPhoneNumbers = user.usersPhones.map((phone) => phone.uspoNumber);
+    const userPhoneNumbers = user.usersPhones.map((phone) => ({
+      uspoNumber: phone.uspoNumber,
+      phoneNumberType: phone.uspoPontyCode?.pontyCode, // Ambil pontyCode dari PhoneNumberType
+    }));
     return {
       userEntityId: user.userEntityId,
       userName: user.userName,
       userFirstName: user.userFirstName,
+      userPhoto: user.userPhoto,
       userLastName: user.userLastName,
       userEmail: userEmails,
       userPhoneNumber: userPhoneNumbers,
@@ -106,6 +122,7 @@ export class UsersController {
     @Body() fields: any,
   ) {
     return this.authService.editprofile(file, id, fields);
+    // console.log(`file : ${file}`);
   }
 
   @Put('users/profile/password/:id')
@@ -156,14 +173,22 @@ export class UsersController {
 
   @Post('users/profile/address/:id')
   @UseInterceptors(FileInterceptor('fields'))
-  public async addAddress(@Param('id') id: number, @Body() fields: any) {
-    return this.authService.addaddress(id, fields);
+  public async addAddress(
+    @Param('id') id: number,
+    @Body() fields: any,
+    @Body('search_city', new DefaultValuePipe(null)) search_city: string,
+  ) {
+    return this.authService.addaddress(id, fields, search_city);
   }
 
-  @Put('users/profile/address/:id')
+  @Put('users/profile/address/:addrid') //perubahan pada :id menjadi :addrid dan penambahan search
   @UseInterceptors(FileInterceptor('fields'))
-  public async editAddress(@Param('id') id: number, @Body() fields: any) {
-    return this.authService.editaddress(id, fields);
+  public async editAddress(
+    @Param('addrid') addrid: number,
+    @Body() fields: any,
+    @Body('search_city', new DefaultValuePipe(null)) search_city: string,
+  ) {
+    return this.authService.editaddress(addrid, fields, search_city);
   }
 
   @Delete('users/profile/address/:id')
@@ -188,10 +213,14 @@ export class UsersController {
     return this.authService.deleteeducation(id);
   }
 
-  @Post('users/profile/experience/:id')
+  @Post('users/profile/experience/:id') //penambahan search
   @UseInterceptors(FileInterceptor('fields'))
-  public async addExperience(@Param('id') id: number, @Body() fields: any) {
-    return this.authService.addexperience(id, fields);
+  public async addExperience(
+    @Param('id') id: number,
+    @Body() fields: any,
+    @Body('search_city', new DefaultValuePipe(null)) search_city: string,
+  ) {
+    return this.authService.addexperience(id, fields, search_city);
   }
 
   @Put('users/profile/experience/:usexid')
@@ -199,12 +228,22 @@ export class UsersController {
   public async editExperience(
     @Param('usexid') usexid: number,
     @Body() fields: any,
+    @Body('search_city', new DefaultValuePipe(null)) search_city: string,
   ) {
-    return this.authService.editexperience(usexid, fields);
+    return this.authService.editexperience(usexid, fields, search_city);
   }
 
   @Delete('users/profile/experience/:usexid')
   public async Deleteexperience(@Param('usexid') usexid: number) {
     return this.authService.deleteexperience(usexid);
+  }
+
+  @Post('users/profile/skill/:id')
+  @UseInterceptors(FileInterceptor('search_skill'))
+  public async addSkill(
+    @Param('id') id: number,
+    @Body('search_skill', new DefaultValuePipe(null)) search_skill: string,
+  ) {
+    return this.authService.addskill(id, search_skill);
   }
 }
