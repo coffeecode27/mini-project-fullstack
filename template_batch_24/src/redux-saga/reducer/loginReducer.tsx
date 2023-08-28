@@ -3,6 +3,7 @@ import * as userAction from '../constant/userConstant';
 const INIT_STATE = {
     isLoggedIn: false,
     currentUser: null,
+    loginFail: false,
     // ... properti lain yang berkaitan dengan proses login
 };
 
@@ -12,21 +13,15 @@ const loginReducer = (state = INIT_STATE, action:any) => {
             return {
                 ...state,
                 isLoggedIn: true,
-                currentUser: action.tokenResult,
+                currentUser: action.result,
+                loginFail: false, // Reset loginFail saat login sukses
             };
         case userAction.USER_LOGIN_FAIL:
             return {
                 ...state,
-                isLoggedIn: false,
-                currentUser: null,
+                loginFail: action.error,
             };
-        case userAction.USER_LOGOUT:
-        sessionStorage.removeItem('access_token');
-        return {
-          ...state,
-          isLoggedIn: false,
-          currentUser: null,
-        };
+
         default:
             return state;
     }

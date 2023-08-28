@@ -47,13 +47,16 @@ const getOneUser = async (id:any) => {
     }
   };
 
-
   const userLogin = async (payload: any) => {
     try {
       const result = await axios.post(`${config.domain}/api/signin`, payload);
       return result;
     } catch (error:any) {
-      return error.response;
+      if (error.response && error.response.data) {
+        throw new Error(error.response.data.message); // Throw the error message from the response
+      } else {
+        throw new Error('An error occurred while processing your request.'); // Throw a generic error message
+      }
     }
   };
 
@@ -75,6 +78,31 @@ const getOneUser = async (id:any) => {
     }
   };
 
+
+
+  const addAddress = async (payload: any) => {
+    try {
+      const result = await axios.post(`${config.domain}/api/users/profile/address/${payload.id}`, payload);
+      return result;
+    } catch (error:any) {
+      if (error.response && error.response.data) {
+        throw new Error(error.response.data.message); // Throw the error message from the response
+      } else {
+        throw new Error('An error occurred while processing your request.'); // Throw a generic error message
+      }
+    }
+  };
+
+  const getAddress = async (payload: any) => {
+    try {
+      const result = await axios.post(`${config.domain}/api/address/${payload.id}`);
+      return result;
+  } catch (error) {
+    return await error;
+  }
+  }
+
+
   export default {
     userSignUp,
     getAllUser,
@@ -82,5 +110,7 @@ const getOneUser = async (id:any) => {
     getAllEmployee,
     userLogin,
     getOneUser,
-    editProfile
+    editProfile,
+    addAddress,
+    getAddress
   }

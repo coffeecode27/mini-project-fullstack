@@ -98,11 +98,22 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    // Mengambil data alamat dari properti usersAddresses
+    const userAddresses = user.usersAddresses.map((address) => ({
+      addrId: address.address.addrId,
+      addressLine1: address.address.addrLine1,
+      addressLine2: address.address.addrLine2,
+      postalCode: address.address.addrPostalCode,
+      city: address.address.addrCity?.cityName, // Mengambil nama kota
+      // ... tambahkan informasi lain yang ingin Anda tampilkan
+    }));
+
     const userEmails = user.usersEmails.map((email) => email.pmailAddress);
     const userPhoneNumbers = user.usersPhones.map((phone) => ({
       uspoNumber: phone.uspoNumber,
-      phoneNumberType: phone.uspoPontyCode?.pontyCode, // Ambil pontyCode dari PhoneNumberType
+      phoneNumberType: phone.uspoPontyCode?.pontyCode,
     }));
+
     return {
       userEntityId: user.userEntityId,
       userName: user.userName,
@@ -111,7 +122,13 @@ export class UsersController {
       userLastName: user.userLastName,
       userEmail: userEmails,
       userPhoneNumber: userPhoneNumbers,
+      userAddress: userAddresses, // Menambahkan data alamat
     };
+  }
+
+  @Get('address/:id')
+  public async getAddressById(@Param('id') id: number) {
+    return this.authService.getAddressById(id);
   }
 
   @Put('users/profile/edit/:id')
@@ -181,7 +198,7 @@ export class UsersController {
     return this.authService.addaddress(id, fields, search_city);
   }
 
-  @Put('users/profile/address/:addrid') //perubahan pada :id menjadi :addrid dan penambahan search
+  @Put('users/profile/address/:addrid')
   @UseInterceptors(FileInterceptor('fields'))
   public async editAddress(
     @Param('addrid') addrid: number,

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'output/entities/Users';
 import { BusinessEntity } from 'output/entities/BusinessEntity';
@@ -68,6 +72,13 @@ export class UsersService {
     });
   }
 
+  public async getAddressById(id: number) {
+    return await this.AddressRepository.createQueryBuilder('address')
+      .where('address.addrId = :id', { id })
+      .leftJoinAndSelect('address.addrCity', 'city')
+      .getOne();
+  }
+
   // Tambahan untuk get semua roleName user = employee
   public async findAllEmployee() {
     return await this.userRepo.find({
@@ -84,39 +95,18 @@ export class UsersService {
     });
   }
 
-  // fungsi melihat satu data tabel users bedasarkan id
-  // public async findOne(id: number) {
-  //   return await this.userRepo.findOne({
-  //     relations: {
-  //       usersEmails: true,
-  //       usersPhones: true,
-  //     },
-  //     where: {
-  //       userEntityId: id,
-  //       usersEmails: {
-  //         pmailEntity: {
-  //           userEntityId: id,
-  //         },
-  //       },
-  //       usersPhones: {
-  //         uspoEntity: {
-  //           userEntityId: id,
-  //         },
-  //       },
-  //     },
-  //   });
-  // }
-
   public async findOne(id: number) {
     return await this.userRepo
       .createQueryBuilder('user')
       .where('user.userEntityId = :id', { id })
       .leftJoinAndSelect('user.usersEmails', 'usersEmail')
       .leftJoinAndSelect('user.usersPhones', 'usersPhone')
-      .leftJoinAndSelect('usersPhone.uspoPontyCode', 'phoneNumberType') // Tambahkan relasi
+      .leftJoinAndSelect('usersPhone.uspoPontyCode', 'phoneNumberType')
+      .leftJoinAndSelect('user.usersAddresses', 'usersAddress') // Tambahkan relasi ke UsersAddress
+      .leftJoinAndSelect('usersAddress.address', 'address') // Tambahkan relasi dari usersAddress
+      .leftJoinAndSelect('address.addrCity', 'city') // Tambahkan relasi dari Address ke city
       .getOne();
   }
-
   //fungsi signup users menjadi candidate atau talent berdasarkan apply yang dipilih
   public async signup(fields: any) {
     let businessEntity: BusinessEntity;
@@ -368,6 +358,26 @@ export class UsersService {
   }
 
   //fungsi validasi username dan password untuk signin
+  // public async validateUser(username: string, password: string) {
+  //   const user = await this.userRepo.findOne({
+  //     where: [
+  //       { userName: username },
+  //       { usersEmails: { pmailAddress: username } },
+  //     ],
+  //     relations: ['usersEmails'],
+  //   });
+
+  //   if (user) {
+  //     const compare = await bcrypt.compare(password, user.userPassword);
+  //     if (compare) {
+  //       const { userPassword, ...result } = user;
+  //       return result;
+  //     }
+  //   }
+
+  //   return null;
+  // }
+
   public async validateUser(username: string, password: string) {
     const user = await this.userRepo.findOne({
       where: [
@@ -382,10 +392,12 @@ export class UsersService {
       if (compare) {
         const { userPassword, ...result } = user;
         return result;
+      } else {
+        throw new Error('Invalid password'); // Throw error jika password salah
       }
     }
 
-    return null;
+    throw new Error('User not found'); // Throw error jika user tidak ditemukan
   }
 
   //fungsi login untuk membuat token
@@ -579,7 +591,7 @@ export class UsersService {
       const Address = await this.AddressRepository.save({
         addrLine1: fields.address1,
         addrLine2: fields.address2,
-        addrPostalCode: fields.poscode,
+        addrPostalCode: fields.postalCode,
         addrCity: { cityId },
         addrModifiedDate: new Date(),
       });
@@ -697,7 +709,12 @@ export class UsersService {
           etadModifiedDate: new Date(),
         },
       );
-
+      console.debug(
+        'Updated useraddressadty:',
+        useraddress,
+        address,
+        useraddressadty,
+      );
       return { useraddress, address, useraddressadty };
     } catch (error) {
       throw new Error(error.message);

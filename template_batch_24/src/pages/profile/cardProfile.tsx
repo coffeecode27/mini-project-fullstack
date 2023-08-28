@@ -84,8 +84,8 @@ export const CardProfile = ({ dataProfile } : any) => {
 </Card>
     <CardLogin/>
     <CardEmail/>
-    <CardPhone dataUser={dataUser}/>
-    <CardAddress/>
+    <CardPhone  dataUser={dataUser}/>
+    <CardAddress dataUser={dataUser} dataProfile={dataProfile}/>
     </div>
     )
 }

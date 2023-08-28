@@ -12,7 +12,7 @@ export class LocalGuard extends PassportStrategy(Strategy) {
   async validate(username: string, password: string): Promise<any> {
     const user = await this.authService.validateUser(username, password);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Invalid username or password'); // Throw UnauthorizedException saat validasi gagal
     }
     return user;
   }

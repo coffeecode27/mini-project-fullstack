@@ -47,18 +47,19 @@ const CardPhone = ({dataUser}:any) => {
       </Flowbite>
     </span>
     </div>
-    {dataUser && dataUser.map((item: any, index:any) => (
-       <div key={item.userPhoneNumber[index].uspoNumber} className="flow-root">
-       <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+    {dataUser && dataUser.map((item: any) => (
+       <div key={item.userEntityId} className="flow-root">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
          <li className="py-3 sm:py-4">
            <div className="flex items-center space-x-4">
              <div className="min-w-0 flex-1">
-             {item.userPhoneNumber.map((phoneNumber:any, index:any) => (
-               <p key={index} className=" text-sm text-gray-900 break-words">
+             {item.userPhoneNumber.map((phoneNumber:any) => (
+               <p key={phoneNumber.uspoNumber} className=" text-sm text-gray-900 break-words">
                 {phoneNumber.uspoNumber} ({phoneNumber.phoneNumberType})
                </p>
                ))}
-             </div>
+               </div>
+
            <div className="flex items-center space-x-2">
            <Flowbite theme={{ theme: customTheme }}>
            <Button color="edit" className="w-5 h-5" onClick={() => props.setOpenModal('edit-form')}>
@@ -90,8 +91,9 @@ const CardPhone = ({dataUser}:any) => {
            </div>
            </div>
          </li>
-       </ul>
-     </div>
+           </ul>
+          </div>
+    
     ))}
    
   </Card>

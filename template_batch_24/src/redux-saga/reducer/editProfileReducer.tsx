@@ -13,7 +13,6 @@ const editProfileReducer = (state = INIT_STATE, action:any) => {
         ...state,
         editProfileLoading: true,
         editProfileSuccess: false,
-        errorStatus:false,
         editProfileError: null,
       };
     case userAction.USER_EDIT_PROFILE_SUCCESS:
@@ -21,7 +20,6 @@ const editProfileReducer = (state = INIT_STATE, action:any) => {
         ...state,
         editProfileLoading: false,
         editProfileSuccess: true,
-        errorStatus:false,
         editProfileError: null,
       };
     case userAction.USER_EDIT_PROFILE_FAIL:
@@ -29,7 +27,6 @@ const editProfileReducer = (state = INIT_STATE, action:any) => {
         ...state,
         editProfileLoading: false,
         editProfileSuccess: false,
-        errorStatus:true,
         editProfileError: action.payload,
       };
     default:

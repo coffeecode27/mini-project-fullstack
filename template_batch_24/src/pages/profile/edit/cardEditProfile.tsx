@@ -129,7 +129,6 @@ const CardEditProfile = ({ dataProfile, dataItem } : any) => {
               <input
                 type="file"
                 name="file"
-               
                 ref={fileInputRef}
                 style={{ display: 'none' }}
                 onChange={handleImageChange}

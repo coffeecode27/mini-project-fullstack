@@ -37,4 +37,5 @@ export class City {
   @ManyToOne(() => Province, (province) => province.cities)
   @JoinColumn([{ name: "city_prov_id", referencedColumnName: "provId" }])
   cityProv: Province;
+  usersAddresses: any;
 }

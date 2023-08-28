@@ -13,14 +13,14 @@ function* loginSaga(action:any): any {
         const tokenResult = result.data.access_token
         // console.log("SAGA LOGIN SUCCESS", tokenResult)
         // Jika login berhasil, simpan token ke session storage/cookie
-        setCookie('access_token', tokenResult);
+         // Kirim aksi ke reducer untuk menandakan login berhasil
+         yield put(userLoginSuccess(tokenResult));
+         setCookie('access_token', tokenResult);
         // sessionStorage.setItem('access_token', tokenResult);
 
-        // Kirim aksi ke reducer untuk menandakan login berhasil
-        yield put(userLoginSuccess(tokenResult));
     } catch (error) {
         // Kirim aksi ke reducer untuk menandakan login gagal
-        yield put(userLoginFail(error));
+        yield put(userLoginFail({ message: 'Invalid username or password' }));
     }
 }
 

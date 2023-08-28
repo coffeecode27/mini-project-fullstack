@@ -7,10 +7,10 @@ export const userLoginReq = (userData:any) => ({
 
 export const userLoginSuccess = (result:any) => ({
     type: userAction.USER_LOGIN_SUCCESS,
-    payload: result,
+    result,
 });
 
 export const userLoginFail = (error:any) => ({
     type: userAction.USER_LOGIN_FAIL,
-    payload: error,
+    error,
 });

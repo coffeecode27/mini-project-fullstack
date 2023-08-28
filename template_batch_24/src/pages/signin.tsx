@@ -1,27 +1,35 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFormik, ErrorMessage } from "formik";
 import { useRouter } from "next/router";
-import { LockClosedIcon } from "@heroicons/react/24/solid";
-import { getDataAllUserReq } from "@/redux-saga/action/userAction";
 import * as Yup from "yup";
 import Link from "next/link";
 import { userLoginReq } from "@/redux-saga/action/loginAction";
+import { Spinner } from "flowbite-react";
 
 export default function signin() {
+ 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFailLogin, setIsFailLogin] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
-  // const { message, UserProfile } = useSelector((state : any) => state.userReducer);
+  const login = useSelector((state:any) => state.login);
   const validationSchema = Yup.object().shape({
     username: Yup.string().required("Username is required"),
     password: Yup.string().min(3).max(10).required("Password is required"),
   });
   
-  // useEffect(() => {
-  //  dispatch(getDataAllUserReq())
-   
-  // }, [dispatch]);
+useEffect(() => {
+  if (login.loginFail) {
+    setIsLoading(false)
+      console.log("GAGAL", login.loginFail.message)
+    // handle error here, you can also use the error message from login.loginFail
+  } else if (login.isLoggedIn && login.currentUser) {
+    setIsLoading(false)
+    router.push('/profile');
+  }
+}, [login, router]);
 
   const formik = useFormik({
     initialValues: {
@@ -35,19 +43,20 @@ export default function signin() {
         password: values.password,
       };
       dispatch(userLoginReq(payload));
-      router.push('/profile');
+      setIsLoading(true)
     },
   });
   return (
+    <>
     <div>
-      <div className="text-center mt-24">
-        <div className="flex items-center justify-center">
-          <img
-            className="h-10 w-auto"
-            src="../assets/images/codeid.png"
-            alt="codeid"
-          />
+    <div className="flex items-center justify-center mt-24">
+               <img
+                  className="h-8 w-15"
+                  src="https://static.wixstatic.com/media/ab2f5c_9fb242eeec974426acc4769b6d7f6d6b~mv2.png/v1/fill/w_320,h_102,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/code-colored_edited.png"
+                  alt="Your Company"
+                  />
         </div>
+      <div className="text-center">
         <h2 className="text-4xl tracking-tight">Sign in into your account</h2>
         <span className="text-sm">
           or{" "}
@@ -117,9 +126,30 @@ export default function signin() {
                 Sign In
               </button>
             </div>
+            {isLoading && (
+            <div className="mt-3">
+              <Spinner aria-label="Saving..." size="lg" />
+            </div>
+            )}
+
+
+      {login.loginFail && (
+              <div className="mt-3">
+                <p className="text-red-600 font-semibold">{login.loginFail.message}</p>
+              </div>
+            )}
+
+            {/* {isFailLogin && (
+            <div className="mt-3">
+              <p className="text-red-600 font-semibold">Password atau Username salah!</p>
+            </div>
+            )} */}
           </div>
         </form>
       </div>
     </div>
+    
+  
+  </>
   );
 }
