@@ -65,8 +65,8 @@ const CardEditProfile = ({ dataProfile, dataItem } : any) => {
     username,
     firstName,
     lastName,
-    birthdate,
-    file : selectedImage,
+    birthdate: birthdate !== null ? birthdate : undefined,
+    file: selectedImage ? selectedImage : undefined,
   };
   console.log(payload)
     try {

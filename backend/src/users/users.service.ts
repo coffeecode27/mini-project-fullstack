@@ -417,23 +417,48 @@ export class UsersService {
   }
 
   //fungsi editprofile users
+  // public async editprofile(file, id: number, fields: any) {
+  //   try {
+  //     if (file && file.filename) {
+  //       // Pengecekan apakah file dan filename ada
+  //       const user = await this.userRepo.update(id, {
+  //         userName: fields.username,
+  //         userFirstName: fields.firstName,
+  //         userLastName: fields.lastName,
+  //         userPhoto: file.filename,
+  //         userBirthDate: fields.birthdate,
+  //         userModifiedDate: new Date(),
+  //       });
+  //       return { user };
+  //     } else {
+  //       // Handle jika file atau filename tidak ada
+  //       throw new Error('Invalid file or filename');
+  //     }
+  //   } catch (error) {
+  //     throw new Error(error.message);
+  //   }
+  // }
+
+  // Service
   public async editprofile(file, id: number, fields: any) {
     try {
+      const updateData: any = {
+        userName: fields.username,
+        userFirstName: fields.firstName,
+        userLastName: fields.lastName,
+        userModifiedDate: new Date(),
+      };
+
       if (file && file.filename) {
-        // Pengecekan apakah file dan filename ada
-        const user = await this.userRepo.update(id, {
-          userName: fields.username,
-          userFirstName: fields.firstName,
-          userLastName: fields.lastName,
-          userPhoto: file.filename,
-          userBirthDate: fields.birthdate,
-          userModifiedDate: new Date(),
-        });
-        return { user };
-      } else {
-        // Handle jika file atau filename tidak ada
-        throw new Error('Invalid file or filename');
+        updateData.userPhoto = file.filename;
       }
+
+      if (fields.birthdate) {
+        updateData.userBirthDate = fields.birthdate;
+      }
+
+      const user = await this.userRepo.update(id, updateData);
+      return { user };
     } catch (error) {
       throw new Error(error.message);
     }
